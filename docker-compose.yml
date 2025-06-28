@@ -7,5 +7,19 @@ services:
       - "3000:3000"
     volumes:
       - ./backend:/app
-      - /app/node_modules  # ← これも `-` が必要
+      - /app/node_modules
     restart: always
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/todo-app
+
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
