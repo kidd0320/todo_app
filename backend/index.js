@@ -1,31 +1,34 @@
 const express = require('express');
+const cors = require('cors');
 const { MongoClient, ObjectId } = require('mongodb');
 
 const app = express();
 const PORT = 3000;
 
 const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost:27017/todo-app';
+
+app.use(cors());            // ← CORSミドルウェアを先に適用
+app.use(express.json());   // ← JSONパーサー
+
 let db;
 
-app.use(express.json());
-
-// MongoDB接続
+// MongoDBに接続
 MongoClient.connect(mongoUrl, { useUnifiedTopology: true })
   .then(client => {
     db = client.db();
     console.log('✅ Connected to MongoDB');
   })
   .catch(err => {
-    console.error('❌ MongoDB connection error:', err);
+    console.error('❌ Failed to connect to MongoDB', err);
   });
 
-// GET /todos
+// TODO一覧取得
 app.get('/todos', async (req, res) => {
   const todos = await db.collection('todos').find().toArray();
   res.json(todos);
 });
 
-// POST /todos { "title": "xxx" }
+// TODO追加
 app.post('/todos', async (req, res) => {
   const { title } = req.body;
   if (!title) return res.status(400).send('title is required');
@@ -34,7 +37,7 @@ app.post('/todos', async (req, res) => {
   res.status(201).json({ id: result.insertedId, title, done: false });
 });
 
-// PUT /todos/:id { "done": true }
+// TODO完了状態更新
 app.put('/todos/:id', async (req, res) => {
   const { id } = req.params;
   const { done } = req.body;
@@ -47,7 +50,7 @@ app.put('/todos/:id', async (req, res) => {
   res.sendStatus(204);
 });
 
-// DELETE /todos/:id
+// TODO削除
 app.delete('/todos/:id', async (req, res) => {
   const { id } = req.params;
   await db.collection('todos').deleteOne({ _id: new ObjectId(id) });
