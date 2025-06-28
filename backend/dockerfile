@@ -1,0 +1,18 @@
+# ベースイメージ
+FROM node:18
+
+# 作業ディレクトリ
+WORKDIR /app
+
+# package.json と package-lock.json を先にコピーして install
+COPY package.json package-lock.json ./
+RUN npm install
+
+# アプリコードをコピー
+COPY . .
+
+# ポート開放
+EXPOSE 3000
+
+# 起動コマンド
+CMD ["npm", "start"]
