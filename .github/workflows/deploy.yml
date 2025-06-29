@@ -30,8 +30,15 @@ jobs:
 
       - name: Build React app
         run: |
+          set -e # エラーが発生したら処理を終了
           cd frontend
+          npm ci
           npm run build
+
+      - name: Test API connectivity
+        run: |
+          curl --fail ${{ secrets.REACT_APP_API_URL }}/todos
+
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
