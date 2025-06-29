@@ -86,7 +86,7 @@ function App() {
         <header className="header">
           <h1 className="title">
             <span className="icon">✨</span>
-            NEW My Todo App 
+            My Todo App 
           </h1>
           <p className="subtitle">シンプルで美しいタスク管理</p>
         </header>
